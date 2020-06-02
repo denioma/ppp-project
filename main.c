@@ -29,32 +29,33 @@ void import_data(FILE *);
 void save_data(FILE *, int *);
 
 int main(int argc, char **argv) {
-    /* Check for shell argument, if less or more than one argument is provided 
-    then program will return with return code 1 */
+    /* Verifica que foram passados o número exato de argumentos necessários (2), caso não sejam o 
+       programa termina com código 1 */
     if (argc != 3) {
         fprintf(stderr, "Expected 2 arguments (Files: Budget Allowances, Spendings).\n");
         return 1;
     }
 
-    /* Input file open with check, if it fails to open then program returns with code 2 */
+    /* Abertura do ficheiro de entrada 1, se abertura não for possível o programa termina com código 2 */
     FILE *read =  NULL;
     if ((read = fopen(*(argv+1), "r")) == NULL) {
         fprintf(stderr, "Fatal error: Failed to open file \"%s\".\n", argv[1]);
         return 2;
     } 
 
-    /* Get all budget data from input data file */
-    int size = 0;
-    root_init();
-    size = set_budget(read);
+    /* Leitura dos dados de orçamento do ficheiro de entrada 1 */
+    int size = 0; // Contém o número de categorias do orçamento, usado para guardar os dados
+    root_init(); // Inicializa a estrutura de dados de suporte ao programa
+    size = set_budget(read); 
     fclose(read);
+    read = NULL;
     
-     /* Input file open with check, if it fails to open then program returns with code 2 */
+    /* Abertura do ficheiro de entrada 2, se abertura não for possível o programa termina com código 2 */
     if ((read = fopen(*(argv+2), "r")) == NULL) {
         fprintf(stderr, "Fatal error: Failed to open file \"%s\".\n", argv[1]);
         return 2;
     }
-    /* Gets all costs and store in struct */
+    /* Leitura dos gastos do orçamento do ficheiro de entrada 2 */
     import_data(read);
     fclose(read);
 
@@ -62,14 +63,15 @@ int main(int argc, char **argv) {
     if (DEBUG) printf("Categories: %d\n", size); /* Debug */
     // view_list(); /* Debug */
 
-    /* Open save file with check, if it fails to open then the program returns with code 2 */
+    /* Abertura do ficheiro de configuração, se a abertura não for possivel o programa termina com o código 2 */
     FILE *config = NULL;
     if ((config = fopen("config.txt", "r")) == NULL) {
         fprintf(stderr, "Fatal error: Failed to open config file.\n");
         return 2;
     }
 
-    /* Get binary save file name from config.txt */
+    /* Leitura do nome de ficheiro binário de saída, se config.txt estiver vazio o programa termina com 
+       o código 3 */
     char savename[50] = "";
     if (fscanf(config, "%s", savename) == 0) {
         fprintf(stderr, "\"config.txt\" is empty.\n");
@@ -78,14 +80,14 @@ int main(int argc, char **argv) {
     // printf("\nSave file name: %s\n", savename); /* Debug */
     fclose(config);
 
-
+    /* Abertura do ficheiro binário de saída, se não for bem sucedido do programa termina com o código 2*/
     FILE *save = NULL;
     if ((save = fopen(savename, "w+b")) == NULL) {
         fprintf(stderr, "Fatal error: Failed to open file to write.\n");
         return 2;
     }
-
-    save_data(save, &size);
+    
+    save_data(save, &size); // Chama a função para guardar os dados obtido no ficheiro binário de saída
     fclose(save);
     return 0;
 }
@@ -100,8 +102,9 @@ int getword(FILE *, char *, int, int *);
 
 int verify_num(char *);
 
-extern int place(char *, float *); // place(char* category, float budget); defined in structs.c
+extern int place(char *, float *); // place(char* category, float budget); definido em structs.c
 
+/* Função de leitura de dados e inicialização da estrutura de suporte ao programa */
 int set_budget(FILE *fp) {
     char c, category[SIZE] = "", convertnum[SIZE] = "";
     float budget;
@@ -137,6 +140,7 @@ int set_budget(FILE *fp) {
 
 extern int update(char *, float *); // update(char *category, float spent)
 
+/* Função de leitura e atualização de dados na estrutura de suporte ao programa */
 void import_data(FILE *fp) {
     char c, str[SIZE] = "";
     float budget;
@@ -177,6 +181,8 @@ void import_data(FILE *fp) {
 
 extern int get(char *cat, int *cat_length, float *budget, float *spent); // defined in structs.c
 
+/* Função para escrever os dados obtidos num ficheiro binário, num formato que permita a leitura
+   e conversão para um ficheiro de texto legível com um programa autónomo */
 void save_data(FILE *fp, int *catnum) {
     int i = 0, macro = SIZE;
     char overbudget[100][SIZE];
@@ -199,6 +205,8 @@ void save_data(FILE *fp, int *catnum) {
     fwrite(&balance, sizeof(balance), 1, fp);
 }
 
+/* Função para ler entidades de um pointeiro para ficheiro para uma string, e com verificações
+    de newline (para permitir a validação dos dados de entrada) */
 int getword(FILE *fp, char *word, int size, int *newline) {
     int i = 0;
     char c;
