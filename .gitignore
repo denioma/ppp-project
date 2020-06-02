@@ -1,0 +1,19 @@
+
+# File extensions to ignore
+
+*.json
+*.txt
+*.code-workspace
+
+# Folders to ignore
+test/*
+carbon screenshots/*
+
+# Files to ignore
+
+enunciado
+reader
+budget
+month
+out
+main-lista*
