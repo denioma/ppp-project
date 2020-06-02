@@ -16,6 +16,8 @@
 
 #include <stdio.h>
 
+#define DEBUG 0
+
 extern void root_init();
 
 extern void view_list();
@@ -37,7 +39,7 @@ int main(int argc, char **argv) {
     /* Input file open with check, if it fails to open then program returns with code 2 */
     FILE *read =  NULL;
     if ((read = fopen(*(argv+1), "r")) == NULL) {
-        fprintf(stderr, "Failed to open file \"%s\".\n", argv[1]);
+        fprintf(stderr, "Fatal error: Failed to open file \"%s\".\n", argv[1]);
         return 2;
     } 
 
@@ -49,7 +51,7 @@ int main(int argc, char **argv) {
     
      /* Input file open with check, if it fails to open then program returns with code 2 */
     if ((read = fopen(*(argv+2), "r")) == NULL) {
-        fprintf(stderr, "Failed to open file \"%s\".\n", argv[1]);
+        fprintf(stderr, "Fatal error: Failed to open file \"%s\".\n", argv[1]);
         return 2;
     }
     /* Gets all costs and store in struct */
@@ -57,13 +59,13 @@ int main(int argc, char **argv) {
     fclose(read);
 
     // puts(""); /* Debug */
-    printf("Categories: %d\n", size); /* Debug */
+    if (DEBUG) printf("Categories: %d\n", size); /* Debug */
     // view_list(); /* Debug */
 
     /* Open save file with check, if it fails to open then the program returns with code 2 */
     FILE *config = NULL;
     if ((config = fopen("config.txt", "r")) == NULL) {
-        fprintf(stderr, "Failed to open config file.\n");
+        fprintf(stderr, "Fatal error: Failed to open config file.\n");
         return 2;
     }
 
@@ -79,7 +81,7 @@ int main(int argc, char **argv) {
 
     FILE *save = NULL;
     if ((save = fopen(savename, "w+b")) == NULL) {
-        fprintf(stderr, "Failed to open file to write.\n");
+        fprintf(stderr, "Fatal error: Failed to open file to write.\n");
         return 2;
     }
 
@@ -94,7 +96,7 @@ int main(int argc, char **argv) {
 
 #define SIZE 50
 
-int getword(FILE *, char *, int);
+int getword(FILE *, char *, int, int *);
 
 int verify_num(char *);
 
@@ -104,20 +106,28 @@ int set_budget(FILE *fp) {
     char category[SIZE] = "", convertnum[SIZE] = "";
     float budget;
     int count = 0;
+    int newline;
 
-    printf("Budget allowances:\n"); /* Debug */
+    if (DEBUG) printf("Budget allowances:\n"); /* Debug */
     while (!feof(fp)) {
-        getword(fp, category, SIZE);
-        if (strcmp(category, "") == 0) break;
-        getword(fp, convertnum, SIZE);
-        if (verify_num(convertnum)) fprintf(stderr, "Invalid budget value!\n");
+        getword(fp, category, SIZE, &newline);
+        if (newline) fprintf(stderr, "Entidade em falta, linha ignorada\n");
         else {
-            budget = atof(convertnum);
-            printf("%s: %.2f\n", category, budget); /* Debug */
-            if (place(category, &budget)) fprintf(stderr, "Failure on placement.\n");
-            else printf("Placement successful.\n"); 
-            count++;
-        } 
+            if (strcmp(category, "") == 0) break;
+            getword(fp, convertnum, SIZE, &newline);
+            if (!newline) {
+                fprintf(stderr, "Mais do que 2 entidades encontradas, entidades extra são ignoradas\n");
+                while (fgetc(fp) != '\n');
+            }
+            if (verify_num(convertnum)) fprintf(stderr, "Valor inválido no ficheiro, ignorado\n");
+            else {
+                budget = atof(convertnum);
+                if (DEBUG) printf("%s: %.2f\n", category, budget); /* Debug */
+                if (place(category, &budget)) fprintf(stderr, "Failure on placement.\n");
+                else printf("Placement successful.\n"); 
+                count++;
+            } 
+        }
     }
     return count;
 }
@@ -127,23 +137,34 @@ extern int update(char *, float *); // update(char *category, float spent)
 void import_data(FILE *fp) {
     char category[SIZE] = "", convertnum[SIZE] = "";
     float budget;
+    int newline = 0;
 
-    printf("\nExpenses:\n"); /* Debug */
+    if (DEBUG) printf("\nExpenses:\n"); /* Debug */
     while(!feof(fp)) {
-        getword(fp, category, SIZE);
-        if (strcmp(category, "") == 0) break;
-        printf("Description: %s\n", category); /* Debug */
-        getword(fp, convertnum, SIZE);
-        if (verify_num(convertnum)) {
-            fprintf(stderr, "Invalid number! Skipping expense...\n\n");
-            while(fgetc(fp) != '\n');
-        } else {
-            budget = atof(convertnum);
-            printf("Spent: %.2f\n", budget); /* Debug */
-            getword(fp, category, SIZE);
-            printf("Category: %s\n", category); /* Debug */
-            if (update(category, &budget)) fprintf(stderr, "Category not found.\n");
-            else printf("Expense added.\n\n");
+        getword(fp, category, SIZE, &newline);
+        if (newline) fprintf(stderr, "Entidades em falta, linha ignorada\n");
+        else {
+            if (strcmp(category, "") == 0) break;
+            if (DEBUG) printf("Description: %s\n", category); /* Debug */
+            getword(fp, convertnum, SIZE, &newline);
+            if (newline) fprintf(stderr, "Entidade em falta, linha ignorada\n");
+            else {
+                if (verify_num(convertnum)) {
+                    fprintf(stderr, "Invalid number! Skipping expense...\n\n");
+                    while(fgetc(fp) != '\n');
+                } else {
+                    budget = atof(convertnum);
+                    if (DEBUG) printf("Spent: %.2f\n", budget); /* Debug */
+                    getword(fp, category, SIZE, &newline);
+                    if (!newline) {
+                        fprintf(stderr, "Mais do que 2 entidades encontradas, entidades extra são ignoradas\n");
+                        while (fgetc(fp) != '\n');
+                    }
+                    if (DEBUG) printf("Category: %s\n", category); /* Debug */
+                    if (update(category, &budget)) fprintf(stderr, "Category not found.\n");
+                    else printf("Expense added.\n\n");
+                }
+            }
         }
     }
 }
@@ -172,13 +193,15 @@ void save_data(FILE *fp, int *catnum) {
     fwrite(&balance, sizeof(balance), 1, fp);
 }
 
-int getword(FILE *fp, char *word, int size) {
+int getword(FILE *fp, char *word, int size, int *newline) {
     int i = 0;
     char c;
     while ((c = fgetc(fp)) != EOF) {
         if (i < size && c != '\t' && c != '\n') {
             *(word+(i++)) = c;
         } else {
+            if (c == '\n' && newline != NULL) *newline = 1;
+            else *newline = 0;
             *(word+i) = '\0';
             /* Se uma palavra for maior do que o tamanho máximo da string,
                 descarta o resto até uma nova entidade */
