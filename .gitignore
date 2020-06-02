@@ -17,3 +17,8 @@ budget
 month
 out
 main-lista*
+
+# Exceptions
+
+!budgets.txt
+!spent.txt

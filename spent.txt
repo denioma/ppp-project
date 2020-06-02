@@ -1,0 +1,6 @@
+Kurber Bing	8.99	Food
+TMSUC	15.00	Transportation
+Bull and Pear	100	Clothing
+
+Ninemas COS	12.99	Entertainment
+Padio Ropular	100	Other
