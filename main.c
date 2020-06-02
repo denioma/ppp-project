@@ -16,7 +16,7 @@
 
 #include <stdio.h>
 
-#define DEBUG 0
+#define DEBUG 1
 
 extern void root_init();
 
@@ -103,7 +103,7 @@ int verify_num(char *);
 extern int place(char *, float *); // place(char* category, float budget); defined in structs.c
 
 int set_budget(FILE *fp) {
-    char category[SIZE] = "", convertnum[SIZE] = "";
+    char c, category[SIZE] = "", convertnum[SIZE] = "";
     float budget;
     int count = 0;
     int newline;
@@ -111,9 +111,12 @@ int set_budget(FILE *fp) {
     if (DEBUG) printf("Budget allowances:\n"); /* Debug */
     while (!feof(fp)) {
         getword(fp, category, SIZE, &newline);
-        if (newline) fprintf(stderr, "Entidade em falta, linha ignorada\n");
+        if (newline) {
+            if ((c = fgetc(fp)) != EOF) ungetc(c, fp);
+            else break;
+            fprintf(stderr, "Entidade em falta, linha ignorada\n\n");
+        }
         else {
-            if (strcmp(category, "") == 0) break;
             getword(fp, convertnum, SIZE, &newline);
             if (!newline) {
                 fprintf(stderr, "Mais do que 2 entidades encontradas, entidades extra são ignoradas\n");
@@ -123,8 +126,8 @@ int set_budget(FILE *fp) {
             else {
                 budget = atof(convertnum);
                 if (DEBUG) printf("%s: %.2f\n", category, budget); /* Debug */
-                if (place(category, &budget)) fprintf(stderr, "Failure on placement.\n");
-                else printf("Placement successful.\n"); 
+                if (place(category, &budget)) fprintf(stderr, "Failure on placement.\n\n");
+                else printf("Placement successful.\n\n"); 
                 count++;
             } 
         }
@@ -135,33 +138,36 @@ int set_budget(FILE *fp) {
 extern int update(char *, float *); // update(char *category, float spent)
 
 void import_data(FILE *fp) {
-    char category[SIZE] = "", convertnum[SIZE] = "";
+    char c, str[SIZE] = "";
     float budget;
     int newline = 0;
 
     if (DEBUG) printf("\nExpenses:\n"); /* Debug */
     while(!feof(fp)) {
-        getword(fp, category, SIZE, &newline);
-        if (newline) fprintf(stderr, "Entidades em falta, linha ignorada\n");
+        getword(fp, str, SIZE, &newline);
+        if (newline) {
+            if ((c = fgetc(fp)) != EOF) ungetc(c, fp);
+            else break;
+            fprintf(stderr, "Entidades em falta, linha ignorada\n\n");
+        } 
         else {
-            if (strcmp(category, "") == 0) break;
-            if (DEBUG) printf("Description: %s\n", category); /* Debug */
-            getword(fp, convertnum, SIZE, &newline);
-            if (newline) fprintf(stderr, "Entidade em falta, linha ignorada\n");
+            if (DEBUG) printf("Description: %s\n", str); /* Debug */
+            getword(fp, str, SIZE, &newline);
+            if (newline) fprintf(stderr, "Entidade em falta, linha ignorada\n\n");
             else {
-                if (verify_num(convertnum)) {
+                if (verify_num(str)) {
                     fprintf(stderr, "Invalid number! Skipping expense...\n\n");
                     while(fgetc(fp) != '\n');
                 } else {
-                    budget = atof(convertnum);
+                    budget = atof(str);
                     if (DEBUG) printf("Spent: %.2f\n", budget); /* Debug */
-                    getword(fp, category, SIZE, &newline);
+                    getword(fp, str, SIZE, &newline);
                     if (!newline) {
                         fprintf(stderr, "Mais do que 2 entidades encontradas, entidades extra são ignoradas\n");
                         while (fgetc(fp) != '\n');
                     }
-                    if (DEBUG) printf("Category: %s\n", category); /* Debug */
-                    if (update(category, &budget)) fprintf(stderr, "Category not found.\n");
+                    if (DEBUG) printf("Category: %s\n", str); /* Debug */
+                    if (update(str, &budget)) fprintf(stderr, "Category not found.\n");
                     else printf("Expense added.\n\n");
                 }
             }
@@ -197,9 +203,10 @@ int getword(FILE *fp, char *word, int size, int *newline) {
     int i = 0;
     char c;
     while ((c = fgetc(fp)) != EOF) {
-        if (i < size && c != '\t' && c != '\n') {
+        if (i < size && c != '\t' && c != '\n' && c != '\r') {
             *(word+(i++)) = c;
         } else {
+            if (c == '\r' && (c = fgetc(fp)) != '\n') ungetc(c, fp);
             if (c == '\n' && newline != NULL) *newline = 1;
             else *newline = 0;
             *(word+i) = '\0';

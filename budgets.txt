@@ -1,5 +1,6 @@
 Food	150
 Transportation	30
 Clothing	65
+
 Entertainment	50
 Other	100
