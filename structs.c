@@ -1,3 +1,6 @@
+// Ficheiro fonte autónomo de implementação de estutura de dados para o programa principal
+// Rodrigo Machado (2019218299) - PPP - 2020 
+
 #define QUEUESIZE 100
 
 #define CATSIZE 50

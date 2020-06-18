@@ -1,4 +1,4 @@
-CFLAGS = -Wall -Wextra -g
+CFLAGS = -Wall -Wextra -g -O
 objs = main.c structs.c
 
 budget: $(objs)

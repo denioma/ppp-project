@@ -1,22 +1,26 @@
-/*
-    Ficheiro de entrada começa com duas linha sem dados, depois uma categoria e o seu orçamento por linha,
-    duas linhas sem dados, e as despesas (descrição - valor - categoria)
-*/
+// Programa de tratamento de dados de orçamento mensal
+// Rodrigo Machado (2019218299) - PPP - 2020
 
 /*
-    config.txt
-    Line 1: Save file name
-*/
+    O programa lê dois ficheiros de entrada:
+        1 - Categorias de orçamento
+        2 - Despesas mensais
 
-/*
-    Code 1: Shell arguments error
-    Code 2: fopen() error
-    Code 3: config.txt empty
+    O programa escreve os dados tratados num ficheiro binário com nome num ficheiro de texto:
+        "config.txt"
+
+    Estrutura do ficheiro "config.txt":
+        Linha 1 - Nome do ficheiro binário de saída
+
+    Códigos de erro:
+        Código 1 - Número de argumentos de shell diferente de 2
+        Código 2 - Erro em fopen() 
+        Código 3 - config.txt vazio
 */
 
 #include <stdio.h>
 
-#define DEBUG 1
+#define DEBUG 0
 
 extern void root_init();
 
@@ -138,7 +142,7 @@ int set_budget(FILE *fp) {
     return count;
 }
 
-extern int update(char *, float *); // update(char *category, float spent)
+extern int update(char *, float *); // update(char *category, float *spent)
 
 /* Função de leitura e atualização de dados na estrutura de suporte ao programa */
 void import_data(FILE *fp) {
