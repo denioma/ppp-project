@@ -7,12 +7,13 @@
 
 # Folders to ignore
 test/*
-carbon screenshots/*
+.vscode/*
+txt/*
 
 # Files to ignore
 
 enunciado
-reader
+convert
 budget
 month
 out

@@ -54,7 +54,7 @@ int main(int argc, char **argv) {
     #endif
     fprintf(out, "Gastos Mensais:\n");
     for (int i = 0; i < catnum; i++) {
-        fread(read, 1, strsize, fp);
+        fread(read, sizeof(char), strsize, fp);
         fread(&spent, sizeof(spent), 1, fp);
         #if DEBUG 
         printf("%s - %.2f\n", read, spent);

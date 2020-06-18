@@ -3,9 +3,9 @@ objs = main.c structs.c
 
 budget: $(objs)
 	gcc $(CFLAGS) $(objs) -o budget
-	@ echo "\nBuilt main program, please run \"make reader\" for converter."
+	@ echo "\nBuilt main program, please run \"make converter\" for converter."
 
-reader: reader.c
-	gcc $(CFLAGS) -o reader $<
+converter: reader.c
+	gcc $(CFLAGS) -o convert $<
 	@ echo "\nBuilt reader."
 	
