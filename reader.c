@@ -37,8 +37,8 @@ int main(int argc, char **argv) {
 
     // Tamanhos para uso na leitura dos dados binários
     int strsize = 0, catnum = 0;
-    fread(&strsize, sizeof(strsize), 1, fp);
-    fread(&catnum, sizeof(catnum), 1, fp);
+    fread(&strsize, sizeof(strsize), 1, fp);    // Tamanho das strings guardadas
+    fread(&catnum, sizeof(catnum), 1, fp);      // Número de dados a ler
     #if DEBUG 
     printf("String size - %d\n", strsize);
     printf("No. of categories - %d\n", catnum);
@@ -54,8 +54,8 @@ int main(int argc, char **argv) {
     #endif
     fprintf(out, "Gastos Mensais:\n");
     for (int i = 0; i < catnum; i++) {
-        fread(read, sizeof(char), strsize, fp);
-        fread(&spent, sizeof(spent), 1, fp);
+        fread(read, sizeof(char), strsize, fp); // Leitura do nome da categoria
+        fread(&spent, sizeof(spent), 1, fp);    // Leitura do gasto total da categoria
         #if DEBUG 
         printf("%s - %.2f\n", read, spent);
         #endif
@@ -64,17 +64,17 @@ int main(int argc, char **argv) {
 
     // Número de categorias para os desvios
     catnum = 0;
-    fread(&catnum, sizeof(int), 1, fp);
+    fread(&catnum, sizeof(int), 1, fp); // Número de dados a ler
     // Desvios individuais maiores ou iguais a 10% do valor orçamentado
     if (catnum > 0) {
         fprintf(out, "\nCategorias com desvio maior ou igual a 10%% do orçamento:\n");
         for (int i = 0; i < catnum; i++) {
-            fread(read, sizeof(char), strsize, fp);
+            fread(read, sizeof(char), strsize, fp); // Nome da categoria
             fprintf(out, "\t%s\n", read);
         }
     } else fprintf(out, "\nNão houve nenhum desvio maior ou igual a 10%% do orçamento.\n");
     // Desvio total do orçamento mensal
-    fread(&spent, sizeof(spent), 1, fp);
+    fread(&spent, sizeof(spent), 1, fp);    // Desvio total dos gastos relativamente ao orçamento mensal
     fprintf(out, "\nDesvio global do orçamento mensal: %.2f", spent);
    
     fclose(fp);   // Fechar o ficheiro binário

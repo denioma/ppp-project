@@ -22,9 +22,9 @@
 
 #define DEBUG 0
 
-extern void root_init();
+extern void root_init();    // structs.c
 
-extern void view_list();
+extern void view_list();    // structs.c
 
 int set_budget(FILE *fp);
 
@@ -109,62 +109,68 @@ int getword(FILE *fp, char *word, int size, int *newline);
 
 int verify_num(char *str);
 
-extern int place(char *cat, float *budget);
+extern int place(char *cat, float *budget); // structs.c
 
 // Função de leitura de dados de orçamento mensal
 int set_budget(FILE *fp) {
+    // category -> Nome da categoria; convertnum -> string para conversão do valor de orçamento
     char c, category[SIZE] = "", convertnum[SIZE] = "";
-    float budget;
-    int count = 0;
-    int newline;
+    float budget;   // Valor orçamentado
+    int count = 0;  // Número de categorias inseridas no total
+    int newline;    // Flag de newline, usado na verificação dos dados de entrada
 
     #if DEBUG 
     printf("Budget allowances:\n");
     #endif
     while (!feof(fp)) {
-        getword(fp, category, SIZE, &newline);
-        if (newline) {
-            if ((c = fgetc(fp)) != EOF) ungetc(c, fp);
+        getword(fp, category, SIZE, &newline);  // Copia a primeira entidade da linha para category
+        if (newline) {  // Se atingir um newline, os dados estão incompletos
+            if ((c = fgetc(fp)) != EOF) ungetc(c, fp);  // Verifica se atingiu o end of file
             else break;
             fprintf(stderr, "Entidade em falta, linha ignorada\n\n");
-        }
-        else {
-            getword(fp, convertnum, SIZE, &newline);
-            if (!newline) {
+        } else {
+            getword(fp, convertnum, SIZE, &newline);    // Copia a segunda entidade da linha para convertnum
+            if (!newline) { // Se não for atingido um newline, existem dados a mais que são ignorados
                 fprintf(stderr, "Mais do que 2 entidades encontradas, entidades extra são ignoradas\n");
-                while (fgetc(fp) != '\n');
+                while (fgetc(fp) != '\n');  // Consome o resto da linha
             }
+            // Verficação de valor númerico válido para orçamento
             if (verify_num(convertnum)) fprintf(stderr, "Valor inválido, categoria ignorada\n");
             else {
-                budget = atof(convertnum);
+                budget = atof(convertnum);  // Conversão de string para floating point
                 #if DEBUG 
                 printf("%s: %.2f\n", category, budget);
                 #endif
-                if (place(category, &budget)) fprintf(stderr, "Falha na inserção da categoria\n\n");
-                else printf("Categoria inserida com sucesso\n\n"); 
-                count++;
+                // Inserção dos dados na lista ligada
+                if (place(category, &budget)) fprintf(stderr, "Falha na inserção da categoria: %s\n\n", category);
+                else {
+                    printf("Categoria inserida com sucesso: %s\n\n", category); 
+                    count++;
+                }
             } 
         }
     }
+    // Retorno do total de categorias inseridas com sucesso
     return count;
 }
 
-extern int update(char *cat, float *spent);
+extern int update(char *cat, float *spent); // structs.c
 
 // Função de leitura dos dados de gastos mensais
 void import_data(FILE *fp) {
-    char c, str[SIZE] = "";
-    float budget;
-    int newline = 0;
+    // String para consumir texto (descrição inútil para o programa, e categoria)
+    char c, str[SIZE] = ""; 
+    float budget;   // Valor gasto
+    int newline = 0;    // Flag de newline, usado na verificação dos dados de entrada
 
     #if DEBUG 
     printf("\nExpenses:\n");
     #endif
 
     while(!feof(fp)) {
-        getword(fp, str, SIZE, &newline);
-        if (newline) {
-            if ((c = fgetc(fp)) != EOF) ungetc(c, fp);
+        getword(fp, str, SIZE, &newline);   // Consome a descrição, que é inútil e descartável
+        if (newline) {  // Se atingir um newline, os dados estão incompletos
+            if ((c = fgetc(fp)) != EOF) ungetc(c, fp);  // Verifica se atingiu o end of file
             else break;
             fprintf(stderr, "Entidades em falta, linha ignorada\n\n");
         } 
@@ -172,34 +178,36 @@ void import_data(FILE *fp) {
             #if DEBUG
             printf("Description: %s\n", str);
             #endif
-            getword(fp, str, SIZE, &newline);
-            if (newline) fprintf(stderr, "Entidade em falta, linha ignorada\n\n");
+            getword(fp, str, SIZE, &newline);   // Copia o valor gasto para str
+            // Se atingir um newline, os dados estão incompletos
+            if (newline) fprintf(stderr, "Entidade em falta, linha ignorada\n\n");  
             else {
-                if (verify_num(str)) {
+                if (verify_num(str)) {  // Verficação de valor númerico válido para o gasto
                     fprintf(stderr, "Valor inválido, despesa ignorada\n\n");
-                    while(fgetc(fp) != '\n');
+                    while(fgetc(fp) != '\n');   // Consome o resto da linha, caso o valor seja inválido
                 } else {
-                    budget = atof(str);
+                    budget = atof(str); // Conversão de string para floating point
                     #if DEBUG 
                     printf("Spent: %.2f\n", budget);
                     #endif
-                    getword(fp, str, SIZE, &newline);
-                    if (!newline) {
+                    getword(fp, str, SIZE, &newline); // Copia a categoria do gasto para str
+                    if (!newline) { // Se não for atingido um newline, existem dados a mais que são ignorados
                         fprintf(stderr, "Mais do que 2 entidades encontradas, entidades extra são ignoradas\n");
-                        while (fgetc(fp) != '\n');
+                        while (fgetc(fp) != '\n'); // Consome o resto da linha
                     }
                     #if DEBUG
                     printf("Category: %s\n", str);
                     #endif
-                    if (update(str, &budget)) fprintf(stderr, "Categoria não encontrada\n");
-                    else printf("Despesa adicionada\n\n");
+                    // Atualização da categoria armazenada na estrutura com o gasto lido
+                    if (update(str, &budget)) fprintf(stderr, "Categoria não encontrada: %s\n", str);
+                    else printf("Despesa adicionada: %s - %.2f\n\n", str, budget);
                 }
             }
         }
     }
 }
 
-extern int get(char *cat, int *cat_length, float *budget, float *spent); // definedo em structs.c
+extern int get(char *cat, int *cat_length, float *budget, float *spent); // structs.c
 
 /* Função para escrever os dados obtidos num ficheiro binário, num formato que permita a leitura
    e conversão para um ficheiro de texto legível com um programa autónomo */
