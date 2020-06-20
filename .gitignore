@@ -1,25 +1,10 @@
-
-# File extensions to ignore
-
-*.json
-*.txt
-*.code-workspace
-
 # Folders to ignore
-test/*
 .vscode/*
-txt/*
+carbon screenshots/*
+test/*
 
 # Files to ignore
 
-enunciado
-convert
 budget
-month
+convert
 out
-main-lista*
-
-# Exceptions
-
-!budgets.txt
-!spent.txt

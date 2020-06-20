@@ -1,6 +1,6 @@
 Burger King	8.99	Comida
 SMTUC	15.00	Transportes
-Bull and Pear	19.99	Roupa
+Pull and Bear	19.99	Roupa
 
 Knives Out	12.99	Cinema
 Zara	32.49	Roupa
@@ -19,3 +19,30 @@ Pizza Monumentais	2.99	Comida
 Café do DEI	0.40	Faculdade
 Transdev	20.00	Transportes
 Vodafone	10.00	Telemóvel
+Primark	42.99	Roupa
+Worten	9.99	Outro
+Bar AAC	5.49	Noitadas
+Cartola	1.39	Noitadas
+Beyond Good and Evil	1.44	Jogos
+Sherlock Holmes and The Devil's Daughter	3.37	Jogos
+Mirror's Edge	1.99	Jogos
+Tomb Raider 1+2+3	2.29	Jogos
+Tomb Raider: The Last Revelation + Chronicles	1.29	Jogos
+Tomb Raider: The Angel of Darkness	0.99	Jogos
+Alien: Isolation	1.85	Jogos
+Alan Wake Collector's Edition	1.67	Jogos
+Tomb Raider: Underworld	0.98	Jogos
+Black Desert Online	3.99	Jogos
+Uno	3.99	Jogos
+Netflix	10.99	Outro
+Café com gelado	1.00	Comida
+Baguette do DEI	1.70	Comida
+Boy Erased	11.97	Livros
+Call Me By Your Name	11.00	Livros
+Find Me	15.50	Livros
+The Black Flamingo	16.00	Livros
+Aristotle and Dante Discover The Secrets Of The Universe	16.00	Livros
+O Homem da Areia	18.80	Livros
+Stalker - O Regresso do Hipnotista	17.70	Livros
+A Sombra do Vento	14.95	Livros
+Felix Ever After	11.99	Livros
