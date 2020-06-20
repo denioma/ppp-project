@@ -131,11 +131,11 @@ int set_budget(FILE *fp) {
         } else {
             getword(fp, convertnum, SIZE, &newline);    // Copia a segunda entidade da linha para convertnum
             if (!newline) { // Se não for atingido um newline, existem dados a mais que são ignorados
-                fprintf(stderr, "Mais do que 2 entidades encontradas, entidades extra são ignoradas\n");
+                fprintf(stderr, "Mais do que 2 entidades encontradas, entidades extra são ignoradas\n\n");
                 while (fgetc(fp) != '\n');  // Consome o resto da linha
             }
             // Verficação de valor númerico válido para orçamento
-            if (verify_num(convertnum)) fprintf(stderr, "Valor inválido, categoria ignorada\n");
+            if (verify_num(convertnum)) fprintf(stderr, "Valor inválido, categoria ignorada\n\n");
             else {
                 budget = atof(convertnum);  // Conversão de string para floating point
                 #if DEBUG 
@@ -172,7 +172,7 @@ void import_data(FILE *fp) {
         if (newline) {  // Se atingir um newline, os dados estão incompletos
             if ((c = fgetc(fp)) != EOF) ungetc(c, fp);  // Verifica se atingiu o end of file
             else break;
-            fprintf(stderr, "Entidades em falta, linha ignorada\n\n");
+            if (strcmp(str, "") != 0) fprintf(stderr, "Entidades em falta, linha ignorada\n\n");
         } 
         else {
             #if DEBUG
@@ -192,14 +192,14 @@ void import_data(FILE *fp) {
                     #endif
                     getword(fp, str, SIZE, &newline); // Copia a categoria do gasto para str
                     if (!newline) { // Se não for atingido um newline, existem dados a mais que são ignorados
-                        fprintf(stderr, "Mais do que 2 entidades encontradas, entidades extra são ignoradas\n");
+                        fprintf(stderr, "Mais do que 3 entidades encontradas, entidades extra são ignoradas\n\n");
                         while (fgetc(fp) != '\n'); // Consome o resto da linha
                     }
                     #if DEBUG
                     printf("Category: %s\n", str);
                     #endif
                     // Atualização da categoria armazenada na estrutura com o gasto lido
-                    if (update(str, &budget)) fprintf(stderr, "Categoria não encontrada: %s\n", str);
+                    if (update(str, &budget)) fprintf(stderr, "Categoria não encontrada: %s\n\n", str);
                     else printf("Despesa adicionada: %s - %.2f\n\n", str, budget);
                 }
             }

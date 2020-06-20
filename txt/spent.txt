@@ -1,7 +1,21 @@
-Kurber Bing	8.99	Food
-TMSUC	15.00	Transportation
-Bull and Pear	100	Clothing
+Burger King	8.99	Comida
+SMTUC	15.00	Transportes
+Bull and Pear	19.99	Roupa
 
-Ninemas COS	12.99	Entertainment
-Padio Ropular	100	Other
-Raza	32.49	Clothing
+Knives Out	12.99	Cinema
+Zara	32.49	Roupa
+Wok to Walk	14.99	Comida
+Não vai entrar
+Também não vai entrar	inválido
+Também não vai entrar - categoria não existe	12.45	Other
+Low Kost	2.99	Noitadas	(Entidade extra - ignorada)
+Propinas	87.15	Faculdade
+Hidratação	13.05	Água
+Luz	22.31	Eletricidade
+Internet	40	ISPs
+Senhoria	250	Renda
+Aqui Base Tango	10	Noitadas
+Pizza Monumentais	2.99	Comida
+Café do DEI	0.40	Faculdade
+Transdev	20.00	Transportes
+Vodafone	10.00	Telemóvel

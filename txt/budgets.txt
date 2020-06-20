@@ -1,6 +1,13 @@
-Food	150
-Transportation	30
-Clothing	65
+Comida	150
+Transportes	30
+Roupa	65
+Não vai entrar - falta entidade
+Cinema	50
 
-Entertainment	50
-Other	100
+Noitadas	25
+Água	20
+Eletricidade	20
+ISPs	50
+Renda	250
+Faculdade	90
+Telemóvel   15
